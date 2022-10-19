@@ -1,0 +1,3 @@
+Test-Command: pytest-3
+Depends: python3-sphinx-click,
+    python3-pytest

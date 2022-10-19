@@ -1,0 +1,10 @@
+Document: sphinx-click
+Title: sphinx-click documentation
+Author: Stephen Finucane http://that.guru/
+Abstract: This manual describes how to use the
+ sphinx-click Python module
+Section: Programming/Python
+
+Format: HTML
+Index: /usr/share/doc/python-sphinx-click-doc/html/index.html
+Files: /usr/share/doc/python-sphinx-click-doc/html/*.html

@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+export PYBUILD_NAME=sphinx-click
+
+%:
+	dh $@ --with python3,sphinxdoc --buildsystem=pybuild
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf build/html
+
+override_dh_auto_build:
+	dh_auto_build
+	PYTHONPATH=`pybuild --print {build_dir}` http_proxy='127.0.0.1:9' sphinx-build -N -bhtml        docs/ build/html # HTML generator

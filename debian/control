@@ -1,0 +1,39 @@
+Source: sphinx-click
+Section: python
+Priority: optional
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Uploaders: Drew Parsons <dparsons@debian.org>
+Build-Depends: debhelper-compat (= 13),
+ dh-python,
+ python3-all,
+ python3-click,
+ python3-pbr (>= 2.0~),
+ python3-setuptools,
+ python3-sphinx
+Standards-Version: 4.6.0
+Homepage: https://github.com/click-contrib/sphinx-click
+Vcs-Browser: https://salsa.debian.org/python-team/packages/sphinx-click
+Vcs-Git: https://salsa.debian.org/python-team/packages/sphinx-click.git
+
+Package: python3-sphinx-click
+Architecture: all
+Depends: python3-click, ${python3:Depends}, ${misc:Depends}
+Suggests: python-sphinx-click-doc
+Description: Sphinx plugin to automatically document click-based applications
+ sphinx-click is a Sphinx plugin that allows you to automatically
+ extract documentation from a click-based application and include it
+ in your docs.
+ .
+ This package installs the library for Python 3.
+
+Package: python-sphinx-click-doc
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Depends: ${sphinxdoc:Depends}, ${misc:Depends}
+Description: Sphinx plugin to automatically document click-based applications (docs)
+ sphinx-click is a Sphinx plugin that allows you to automatically
+ extract documentation from a click-based application and include it
+ in your docs.
+ .
+ This is the common documentation package.
