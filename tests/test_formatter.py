@@ -4,6 +4,8 @@ import unittest
 import click
 from sphinx_click import ext
 
+CLICK_VERSION = tuple(int(x) for x in click.__version__.split('.')[0:2])
+
 
 class CommandTestCase(unittest.TestCase):
     """Validate basic ``click.Command`` instances."""
@@ -60,6 +62,11 @@ class CommandTestCase(unittest.TestCase):
             help='A sample option with numeric choices',
             type=click.Choice([1, 2, 3]),
         )
+        @click.option(
+            '--flag',
+            is_flag=True,
+            help='A boolean flag',
+        )
         @click.argument('ARG', envvar='ARG')
         def foobar(bar):
             """A sample command."""
@@ -99,6 +106,10 @@ class CommandTestCase(unittest.TestCase):
             A sample option with numeric choices
 
             :options: 1 | 2 | 3
+
+        .. option:: --flag
+
+            A boolean flag
 
         .. rubric:: Arguments
 
@@ -169,6 +180,18 @@ class CommandTestCase(unittest.TestCase):
             default=lambda: None,
             show_default='Something computed at runtime',
         )
+        @click.option(
+            '--group',
+            default=[('foo', 'bar')],
+            nargs=2,
+            type=click.Tuple([str, str]),
+            multiple=True,
+            show_default=True,
+        )
+        @click.option(
+            '--only-show-default',
+            show_default="Some default computed at runtime!",
+        )
         def foobar(bar):
             """A sample command."""
             pass
@@ -190,11 +213,19 @@ class CommandTestCase(unittest.TestCase):
 
         .. option:: --num-param <num_param>
 
-            :default: 42
+            :default: ``42``
 
         .. option:: --param <param>
 
-            :default: Something computed at runtime
+            :default: ``Something computed at runtime``
+
+        .. option:: --group <group>
+
+            :default: ``('foo', 'bar')``
+
+        .. option:: --only-show-default <only_show_default>
+
+            :default: ``Some default computed at runtime!``
         """
             ).lstrip(),
             '\n'.join(output),
@@ -317,9 +348,149 @@ class CommandTestCase(unittest.TestCase):
 
         .. option:: --param <param>
 
-            :default: Something computed at runtime
+            :default: ``Something computed at runtime``
 
         A sample epilog.
+        """
+            ).lstrip(),
+            '\n'.join(output),
+        )
+
+    @unittest.skipIf(
+        CLICK_VERSION < (8, 1), 'Click < 8.1.0 stores the modified help string'
+    )
+    def test_no_truncation(self):
+        r"""Validate behavior when a \f character is present.
+
+        https://click.palletsprojects.com/en/8.1.x/documentation/#truncating-help-texts
+        """
+
+        @click.command()
+        def cli():
+            """First paragraph.
+
+            This is a very long second
+            paragraph and not correctly
+            wrapped but it will be rewrapped.
+            \f
+
+            :param click.core.Context ctx: Click context.
+            """
+            pass
+
+        ctx = click.Context(cli, info_name='cli')
+        output = list(ext._format_command(ctx, nested='short'))
+
+        # note that we have an extra newline because we're using
+        # docutils.statemachine.string2lines under the hood, which is
+        # converting the form feed to a newline
+        self.assertEqual(
+            textwrap.dedent(
+                """
+        First paragraph.
+
+        This is a very long second
+        paragraph and not correctly
+        wrapped but it will be rewrapped.
+
+
+        :param click.core.Context ctx: Click context.
+
+        .. program:: cli
+        .. code-block:: shell
+
+            cli [OPTIONS]
+        """
+            ).lstrip(),
+            '\n'.join(output),
+        )
+
+    def test_no_line_wrapping(self):
+        r"""Validate behavior when a \b character is present.
+
+        https://click.palletsprojects.com/en/8.1.x/documentation/#preventing-rewrapping
+        """
+
+        @click.command(
+            epilog="""
+An epilog containing pre-wrapped text.
+
+\b
+This is
+a paragraph
+without rewrapping.
+
+And this is a paragraph
+that will be rewrapped again.
+"""
+        )
+        @click.option(
+            '--param',
+            help="""An option containing pre-wrapped text.
+
+            \b
+            This is
+            a paragraph
+            without rewrapping.
+
+            And this is a paragraph
+            that will be rewrapped again.
+            """,
+        )
+        def cli():
+            """A command containing pre-wrapped text.
+
+            \b
+            This is
+            a paragraph
+            without rewrapping.
+
+            And this is a paragraph
+            that will be rewrapped again.
+            """
+            pass
+
+        ctx = click.Context(cli, info_name='cli')
+        output = list(ext._format_command(ctx, nested='short'))
+
+        self.assertEqual(
+            textwrap.dedent(
+                """
+        A command containing pre-wrapped text.
+
+        | This is
+        | a paragraph
+        | without rewrapping.
+
+        And this is a paragraph
+        that will be rewrapped again.
+
+        .. program:: cli
+        .. code-block:: shell
+
+            cli [OPTIONS]
+
+        .. rubric:: Options
+
+        .. option:: --param <param>
+
+            An option containing pre-wrapped text.
+
+            | This is
+            | a paragraph
+            | without rewrapping.
+
+            And this is a paragraph
+            that will be rewrapped again.
+
+        An epilog containing pre-wrapped text.
+
+        | This is
+        | a paragraph
+        | without rewrapping.
+
+        And this is a paragraph
+        that will be rewrapped again.
         """
             ).lstrip(),
             '\n'.join(output),
@@ -412,50 +583,6 @@ class GroupTestCase(unittest.TestCase):
            :noindex:
 
             Provide a default for :option:`ARG`
-        """
-            ).lstrip(),
-            '\n'.join(output),
-        )
-
-    def test_no_line_wrapping(self):
-        r"""Validate behavior when a \b character is present.
-
-        https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
-        """
-
-        @click.group()
-        def cli():
-            """A sample command group.
-
-            \b
-            This is
-            a paragraph
-            without rewrapping.
-
-            And this is a paragraph
-            that will be rewrapped again.
-            """
-            pass
-
-        ctx = click.Context(cli, info_name='cli')
-        output = list(ext._format_command(ctx, nested='short'))
-
-        self.assertEqual(
-            textwrap.dedent(
-                """
-        A sample command group.
-
-        | This is
-        | a paragraph
-        | without rewrapping.
-
-        And this is a paragraph
-        that will be rewrapped again.
-
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
         """
             ).lstrip(),
             '\n'.join(output),
@@ -579,7 +706,7 @@ class CommandFilterTestCase(unittest.TestCase):
         """Validate an empty command group."""
 
         ctx = self._get_ctx()
-        output = list(ext._format_command(ctx, nested='short', commands=''))
+        output = list(ext._format_command(ctx, nested='short', commands=[]))
 
         self.assertEqual(
             textwrap.dedent(
@@ -599,7 +726,9 @@ class CommandFilterTestCase(unittest.TestCase):
         """Validate the order of commands."""
 
         ctx = self._get_ctx()
-        output = list(ext._format_command(ctx, nested='short', commands='world, hello'))
+        output = list(
+            ext._format_command(ctx, nested='short', commands=['world', 'hello'])
+        )
 
         self.assertEqual(
             textwrap.dedent(
@@ -807,6 +936,81 @@ class CommandCollectionTestCase(unittest.TestCase):
         .. object:: world
 
             A world command.
+        """
+            ).lstrip(),
+            '\n'.join(output),
+        )
+
+
+class AutoEnvvarPrefixTestCase(unittest.TestCase):
+    """Validate ``click auto_envvar_prefix``-setup instances."""
+
+    def test_basics(self):
+        """Validate a click application with ``auto_envvar_prefix`` option enabled."""
+
+        @click.command(
+            context_settings={"auto_envvar_prefix": "PREFIX"},
+        )
+        @click.option('--param', help='Help for param')
+        @click.option('--other-param', help='Help for other-param')
+        @click.option(
+            '--param-with-explicit-envvar',
+            help='Help for param-with-explicit-envvar',
+            envvar="EXPLICIT_ENVVAR",
+        )
+        def cli_with_auto_envvars():
+            """A simple CLI with auto-env vars ."""
+
+        cli = cli_with_auto_envvars
+        ctx = click.Context(cli, info_name='cli', auto_envvar_prefix="PREFIX")
+        output = list(ext._format_command(ctx, nested='full'))
+
+        self.assertEqual(
+            textwrap.dedent(
+                """
+        A simple CLI with auto-env vars .
+
+        .. program:: cli
+        .. code-block:: shell
+
+            cli [OPTIONS]
+
+        .. rubric:: Options
+
+        .. option:: --param <param>
+
+            Help for param
+
+        .. option:: --other-param <other_param>
+
+            Help for other-param
+
+        .. option:: --param-with-explicit-envvar <param_with_explicit_envvar>
+
+            Help for param-with-explicit-envvar
+
+        .. rubric:: Environment variables
+
+        .. _cli-param-PREFIX_PARAM:
+
+        .. envvar:: PREFIX_PARAM
+           :noindex:
+
+            Provide a default for :option:`--param`
+
+        .. _cli-other_param-PREFIX_OTHER_PARAM:
+
+        .. envvar:: PREFIX_OTHER_PARAM
+           :noindex:
+
+            Provide a default for :option:`--other-param`
+
+        .. _cli-param_with_explicit_envvar-EXPLICIT_ENVVAR:
+
+        .. envvar:: EXPLICIT_ENVVAR
+           :noindex:
+
+            Provide a default for :option:`--param-with-explicit-envvar`
         """
             ).lstrip(),
             '\n'.join(output),

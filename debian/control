@@ -5,12 +5,14 @@ Maintainer: Debian Python Team <team+python@tracker.debian.org>
 Uploaders: Drew Parsons <dparsons@debian.org>
 Build-Depends: debhelper-compat (= 13),
  dh-python,
+ pybuild-plugin-pyproject,
  python3-all,
  python3-click,
- python3-pbr (>= 2.0~),
+ python3-docutils,
+ python3-pbr,
  python3-setuptools,
- python3-sphinx
-Standards-Version: 4.6.0
+ python3-sphinx (>= 2.0~)
+Standards-Version: 4.6.2
 Homepage: https://github.com/click-contrib/sphinx-click
 Vcs-Browser: https://salsa.debian.org/python-team/packages/sphinx-click
 Vcs-Git: https://salsa.debian.org/python-team/packages/sphinx-click.git

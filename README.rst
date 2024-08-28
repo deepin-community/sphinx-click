@@ -2,16 +2,16 @@
 sphinx-click
 ============
 
-.. image:: https://travis-ci.org/click-contrib/sphinx-click.svg?branch=master
-    :target: https://travis-ci.org/click-contrib/sphinx-click
-    :alt: CI Status
+.. image:: https://github.com/click-contrib/sphinx-click/actions/workflows/ci.yaml/badge.svg
+    :target: https://github.com/click-contrib/sphinx-click/actions/workflows/ci.yaml
+    :alt: Build Status
 
 .. image:: https://readthedocs.org/projects/sphinx-click/badge/?version=latest
     :target: https://sphinx-click.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-`sphinx-click` is a `Sphinx`__ plugin that allows you to automatically extract
-documentation from a `click-based`__ application and include it in your docs.
+``sphinx-click`` is a `Sphinx`__ plugin that allows you to automatically extract
+documentation from a `Click-based`__ application and include it in your docs.
 
 __ http://www.sphinx-doc.org/
 __ http://click.pocoo.org/
@@ -19,28 +19,28 @@ __ http://click.pocoo.org/
 Installation
 ------------
 
-Install the plugin using `pip`:
+Install the plugin using ``pip``:
 
 .. code-block:: shell
 
    $ pip install sphinx-click
 
-Alternatively, install from source by cloning this repo then running
-`setup.py`:
+Alternatively, install from source by cloning this repo then running ``pip``
+locally:
 
 .. code-block:: shell
 
-   $ python setup.py install
+   $ pip install .
 
 Usage
 -----
 
 .. important::
 
-   To document a click-based application, both the application itself and any
+   To document a Click-based application, both the application itself and any
    additional dependencies required by that application **must be installed**.
 
-Enable the plugin in your Sphinx `conf.py` file:
+Enable the plugin in your Sphinx ``conf.py`` file:
 
 .. code-block:: python
 
@@ -57,3 +57,19 @@ documentation.
 
 Detailed information on the various options available is provided in the
 `documentation <https://sphinx-click.readthedocs.io>`_.
+
+Alternative
+-----------
+
+This plugin is perfect to document a Click-based CLI in Sphinx, as it properly
+renders the help screen and its options in nice HTML with deep links and
+styling.
+
+However, if you are looking to document the source code of a Click-based CLI,
+and the result of its execution, you might want to check out `click-extra`__.
+The latter provides the ``.. click:example::`` and ``.. click:run::`` Sphinx
+directives so you can `capture and render, with full colors, the result of your
+CLI in your documentation`__.
+
+__ https://github.com/kdeldycke/click-extra/
+__ https://kdeldycke.github.io/click-extra/sphinx.html
