@@ -1,3 +1,59 @@
+sphinx-click (5.1.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 09 Feb 2024 12:15:57 +0100
+
+sphinx-click (5.0.1-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+
+ -- Dmitry Shachnev <mitya57@debian.org>  Thu, 02 Nov 2023 23:27:42 +0300
+
+sphinx-click (4.4.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Standards-Version: 4.6.2
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 14 Jan 2023 17:08:59 +0100
+
+sphinx-click (4.3.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Standards-Version: 4.6.1
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 16 Jul 2022 16:29:42 +0200
+
+sphinx-click (4.0.2-2) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster:
+    + Build-Depends: Drop versioned constraint on python3-click and python3-pbr.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Fri, 17 Jun 2022 09:32:49 +0100
+
+sphinx-click (4.0.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Build-Depends: python3-docutils
+  * update versioned Build-Depends: python3-click (>= 7.0~),
+    python3-sphinx (>= 2.0~)
+  * Build-Depends: pybuild-plugin-pyproject to build using
+    pyproject.toml
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 16 Apr 2022 13:51:54 +0200
+
+sphinx-click (3.0.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * update doc build
+    - use execute_after_dh_auto_build not override_dh_auto_build
+    - use pybuild dir for default python. Closes: #1002446.
+  * run debian/tests (autopkgtest) verbosely: pytest-3 -v
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 04 Jan 2022 10:51:21 +0100
+
 sphinx-click (3.0.1-1) unstable; urgency=medium
 
   [ Ondřej Nový ]
